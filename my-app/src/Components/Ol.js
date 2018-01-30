@@ -46,13 +46,6 @@ class Ol extends React.Component {
             });
             this.setState({center: coords});
         })
-        /*this.map.on('moveend', function (e) {
-            //let map = e.map;
-            //let center = map.getView().getCenter();
-            //this.setState({center: center});
-            // TODO
-        });
-        */
     }
 
     // This method will be sent to the child component
@@ -106,7 +99,6 @@ class Ol extends React.Component {
         this.map.getView().setZoom(10);
     }
 
-    // TODO make filters as a child of Ol
     // That way we can share info beetween parent and child
     render() {
         return (
@@ -121,6 +113,10 @@ class Ol extends React.Component {
 export default Ol;
 
 
+
+/*
+ * OL styles
+ */
 
 var image = new ol.style.Circle({
         radius: 5,

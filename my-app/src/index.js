@@ -8,7 +8,7 @@ import './index.css';
 /*
 * Main component
 */
-class SocioEco extends React.Component {
+class Main extends React.Component {
 
  constructor(props) {
     super(props);
@@ -27,7 +27,7 @@ class SocioEco extends React.Component {
   render() {
 
     return (
-        <div className="socioeco">
+        <div className="main">
             <div className="navbar">Navbar</div>
 
             <Ol center={this.state.centerMap} />
@@ -40,9 +40,7 @@ class SocioEco extends React.Component {
 
 }
 
-// TODO comment appeler une fonction d'un component qui n'est ni le parent, ni le fils
-
 ReactDOM.render(
-  <SocioEco />,
+  <Main />,
   document.getElementById('root')
 );
