@@ -1,5 +1,7 @@
 import React from 'react';
 
+import config from '../settings.js';
+
 class Filters extends React.Component {
     constructor(props) {
         super(props);
@@ -10,7 +12,7 @@ class Filters extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('Filter will receive new props', nextProps);
+        config.DEBUG ? console.log('Filter will receive new props', nextProps): null;
         this.setState({
                 centerText: nextProps.parentApi.data.center.join(',') ,
                 zoom: nextProps.parentApi.data.zoom
@@ -18,14 +20,12 @@ class Filters extends React.Component {
     }
 
     render() {
-        console.log('Filters is rendering');
+        config.DEBUG ? console.log('Filters is rendering'): null;
 
         const handleChange = (e) => this.props.parentApi.callbacks.updateCenter(this.state.centerText.split(',') );
-
         const handleTextChange = (e) => this.setState({ centerText: e.target.value });
 
         const handleButtonZoom = (e) => this.props.parentApi.callbacks.updateZoom(this.state.zoom );
-
         const handleZoomChange = (e) => this.setState({ zoom: e.target.value });
 
         return (

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import Ol from './Components/Ol';
 import Filters from './Components/Filters';
+
+import config from './settings.js';
 import '../node_modules/openlayers/dist/ol.css';
 import './index.css';
 
@@ -13,9 +15,9 @@ class Main extends React.Component {
 
  constructor(props) {
     super(props);
-    this.title = "Kouac"
+    this.title = "SocioEco"
     this.state = {
-        title: "Board game",
+        title: "SocioEco",
         history: [{
             squares: Array(9).fill(null),
         }],
@@ -27,13 +29,13 @@ class Main extends React.Component {
   }
 
   render() {
-    console.log('Main is rendering');
+    config.DEBUG ? console.log('Main is rendering'): null;
     const updateCenter = center => {
-      console.log('updateCenter');
+      config.DEBUG ? console.log('updateCenter'): null;;
       this.setState({ centerMap: center });
     };
     const updateZoom = zoom => {
-      console.log('updateZoom');
+      config.DEBUG ? console.log('updateZoom'): null;;
       this.setState({ zoomMap: zoom });
     };
 
@@ -48,8 +50,6 @@ class Main extends React.Component {
             <div className="map" >
                 <Ol parentApi={api} />
                 <Filters parentApi={api} />
-            </div>
-            <div className="widget">
             </div>
         </div>
     );

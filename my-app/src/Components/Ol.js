@@ -1,11 +1,13 @@
 import React from 'react';
 import ol from 'openlayers';
 
+import config from '../settings.js';
+
 class Ol extends React.Component {
 
     componentDidMount() {
         // Init OL
-        console.log('Ol mounted', this.props.parentApi.data.center, this.props.parentApi.data.zoom);
+        config.DEBUG ? console.log('Ol mounted', this.props.parentApi.data.center, this.props.parentApi.data.zoom): null;
         this.loadStations();
         const center = this.props.parentApi.data.center;
         const zoom = this.props.parentApi.data.zoom;
@@ -23,7 +25,7 @@ class Ol extends React.Component {
                 }
             }),
             view: new ol.View({
-                center: ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'), //[0, 0],
+                center: ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'),
                 zoom: zoom
             })
         });
@@ -33,32 +35,39 @@ class Ol extends React.Component {
             let center = map.getView().getCenter();
             let coords = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
             let zoom = map.getView().getZoom();
-            console.log(coords);
+            config.DEBUG ? console.log(coords): null;
             coords = coords.map(function(each_element){
                 return Number(each_element.toFixed(2));
             });
-            console.log('ol is updating the center');
+            config.DEBUG ? console.log('ol is updating the center'): null;
             this.props.parentApi.callbacks.updateCenter(coords);
             this.props.parentApi.callbacks.updateZoom(zoom);
         })
     }
 
-    componentDidUpdate() {
-        console.log('Ol has been updated, update the map itself');
+    componentDidUpdate(prevProps, prevState) {
+        config.DEBUG ? console.log('Ol has been updated, update the map itself'): null;
         let tabCoords = this.props.parentApi.data.center;
         let zoom = this.props.parentApi.data.zoom;
 
         // Convert strings to float
         let coords = ol.proj.transform([parseFloat(tabCoords[0]), parseFloat(tabCoords[1])], 'EPSG:4326', 'EPSG:3857');
 
+        // TODO
+        config.DEBUG ? console.log(prevProps.parentApi.data.center): null;
+        config.DEBUG ? console.log(tabCoords): null;
+        config.DEBUG ? console.log(">>>> Updating map center"): null;
         this.map.getView().setCenter(coords);
 
-        this.map.getView().setZoom(zoom);
+        if(prevProps.parentApi.data.zoom !== zoom) {
+            config.DEBUG ? console.log(">>>> Updating map zoom"): null;
+            this.map.getView().setZoom(zoom);
+        }
     }
 
     // That way we can share info beetween parent and child
     render() {
-        console.log('Ol is rendering');
+        config.DEBUG ? console.log('Ol is rendering'): null;
         return ( <div className="map" id="map"></div>);
     }
 
