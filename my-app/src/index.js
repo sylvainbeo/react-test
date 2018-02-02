@@ -37,12 +37,17 @@ class Main extends React.Component {
       this.setState({ zoomMap: zoom });
     };
 
+    const api = {
+        data: {center: this.state.centerMap, zoom: this.state.zoomMap},
+        callbacks: {updateZoom, updateCenter}
+    };
+
     return (
         <div className="main">
             <div className="navbar">Navbar</div>
             <div className="map" >
-                <Ol center={this.state.centerMap} zoom={this.state.zoomMap} updateCenter={updateCenter} updateZoom={updateZoom} />
-                <Filters center={this.state.centerMap} zoom={this.state.zoomMap} updateCenter={updateCenter} updateZoom={updateZoom} />
+                <Ol parentApi={api} />
+                <Filters parentApi={api} />
             </div>
             <div className="widget">
             </div>

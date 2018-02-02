@@ -5,10 +5,10 @@ class Ol extends React.Component {
 
     componentDidMount() {
         // Init OL
-        console.log('Ol mounted', this.props.center, this.props.zoom);
+        console.log('Ol mounted', this.props.parentApi.data.center, this.props.parentApi.data.zoom);
         this.loadStations();
-        const center = this.props.center;
-        const zoom = this.props.zoom;
+        const center = this.props.parentApi.data.center;
+        const zoom = this.props.parentApi.data.zoom;
 
         this.map = new ol.Map({
             layers: [
@@ -38,15 +38,15 @@ class Ol extends React.Component {
                 return Number(each_element.toFixed(2));
             });
             console.log('ol is updating the center');
-            this.props.updateCenter(coords);
-            this.props.updateZoom(zoom);
+            this.props.parentApi.callbacks.updateCenter(coords);
+            this.props.parentApi.callbacks.updateZoom(zoom);
         })
     }
 
     componentDidUpdate() {
         console.log('Ol has been updated, update the map itself');
-        let tabCoords = this.props.center;
-        let zoom = this.props.zoom;
+        let tabCoords = this.props.parentApi.data.center;
+        let zoom = this.props.parentApi.data.zoom;
 
         // Convert strings to float
         let coords = ol.proj.transform([parseFloat(tabCoords[0]), parseFloat(tabCoords[1])], 'EPSG:4326', 'EPSG:3857');
