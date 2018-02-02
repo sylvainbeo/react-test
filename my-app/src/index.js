@@ -21,7 +21,8 @@ class Main extends React.Component {
         }],
         stepNumber: 0,
         xIsNext: true,
-        centerMap: [45, 5],
+        centerMap: [5, 45],
+        zoomMap: 5,
     };
   }
 
@@ -31,13 +32,17 @@ class Main extends React.Component {
       console.log('updateCenter');
       this.setState({ centerMap: center });
     };
+    const updateZoom = zoom => {
+      console.log('updateZoom');
+      this.setState({ zoomMap: zoom });
+    };
 
     return (
         <div className="main">
             <div className="navbar">Navbar</div>
             <div className="map" >
-                <Ol center={this.state.centerMap} updateCenter={updateCenter} />
-                <Filters center={this.state.centerMap} updateCenter={updateCenter} />
+                <Ol center={this.state.centerMap} zoom={this.state.zoomMap} updateCenter={updateCenter} updateZoom={updateZoom} />
+                <Filters center={this.state.centerMap} zoom={this.state.zoomMap} updateCenter={updateCenter} updateZoom={updateZoom} />
             </div>
             <div className="widget">
             </div>
