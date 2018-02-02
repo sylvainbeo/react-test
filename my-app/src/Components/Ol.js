@@ -1,38 +1,32 @@
 import React from 'react';
 import ol from 'openlayers';
 
-import Filters from './Filters';
-
 class Ol extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            center: this.props.center
-        };
-        this.centerMap = this.centerMap.bind(this);
-        this.centerHandler = this.centerHandler.bind(this);
-
     }
+
     componentDidMount() {
         // Init OL
-        //console.log(this.props);
+        console.log('Ol mounted', this.props.center);
         this.loadStations();
+        const center = this.props.center;
 
         this.map = new ol.Map({
-                layers: [
-                    new ol.layer.Tile({
-                        source: new ol.source.OSM()
-                    })
-                ],
-                target: 'map',
-                controls: ol.control.defaults({
-                    attributionOptions: {
-                        collapsible: false
-                    }
-                }),
-                view: new ol.View({
-                center: this.props.center, //[0, 0],
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            target: 'map',
+            controls: ol.control.defaults({
+                attributionOptions: {
+                    collapsible: false
+                }
+            }),
+            view: new ol.View({
+                center: ol.proj.transform(center, 'EPSG:4326', 'EPSG:3857'), //[0, 0],
                 zoom: 2
             })
         });
@@ -41,19 +35,15 @@ class Ol extends React.Component {
             let map = e.map;
             let center = map.getView().getCenter();
             let coords = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+            console.log(coords);
             coords = coords.map(function(each_element){
                 return Number(each_element.toFixed(2));
             });
-            this.setState({center: coords});
+            console.log('ol is updating the center');
+            this.props.updateCenter(coords);
         })
     }
 
-    // This method will be sent to the child component
-    centerHandler(center) {
-        this.setState({
-            center: center
-        });
-    }
     loadStations() {
         /*
         fetch("data/items.json")
@@ -88,25 +78,21 @@ class Ol extends React.Component {
         */
     }
 
-
-    centerMap(center) {
-        let tabCoords = center;
+    componentDidUpdate() {
+        console.log('Ol has been updated, update the map itself');
+        let tabCoords = this.props.center;
 
         // Convert strings to float
         let coords = ol.proj.transform([parseFloat(tabCoords[0]), parseFloat(tabCoords[1])], 'EPSG:4326', 'EPSG:3857');
 
         this.map.getView().setCenter(coords);
-        this.map.getView().setZoom(10);
+        //this.map.getView().setZoom(10);
     }
 
     // That way we can share info beetween parent and child
     render() {
-        return (
-            <div className="map" >
-                <div className="map" id="map"></div>
-                <Filters centerMap={this.centerMap} center={this.state.center} action={this.centerHandler} />
-            </div>
-        );
+        console.log('Ol is rendering');
+        return ( <div className="map" id="map"></div>);
     }
 }
 
