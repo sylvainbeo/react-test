@@ -1,9 +1,9 @@
 import React from 'react';
 import * as itowns from 'itowns';
-import * as THREE from 'three';
+//import * as THREE from 'three';
 import proj4 from 'proj4';
 
-import * as h from '../helper';
+//import * as h from '../helper';
 
 class Itowns extends React.Component {
 
@@ -24,12 +24,19 @@ class Itowns extends React.Component {
         // Define projection that we will use (taken from https://epsg.io/3946, Proj4js section)
         proj4.defs('EPSG:3946',
             '+proj=lcc +lat_1=45.25 +lat_2=46.75 +lat_0=46 +lon_0=3 +x_0=1700000 +y_0=5200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
+        proj4.defs('EPSG:3857',
+            '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
 
         // Define geographic extent: CRS, min/max X, min/max Y
-        extent = new itowns.Extent(
+        /*extent = new itowns.Extent(
             'EPSG:3946',
             1837816.94334, 1847692.32501,
             5170036.4587, 5178412.82698);
+            */
+            extent = new itowns.Extent(
+                'EPSG:3857',
+                -20026376.39, -20048966.10,
+                20026376.39, 20048966.10);
 
         // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
         viewerDiv = document.getElementById('map');
@@ -38,8 +45,25 @@ class Itowns extends React.Component {
         view = new itowns.PlanarView(viewerDiv, extent, { renderer: renderer });
         view.tileLayer.disableSkirt = true;
 
-        // Add an WMS imagery layer (see WMS_Provider* for valid options)
+        // Example to add an OPENSM Layer
         view.addLayer({
+          type: 'color',
+          protocol:   'wmtsc',
+          id:         'OPENSM',
+          fx: 2.5,
+          customUrl:  'http://b.tile.openstreetmap.fr/osmfr/%TILEMATRIX/%COL/%ROW.png',
+          options: {
+              attribution : {
+                  name: 'OpenStreetMap',
+                  url: 'http://www.openstreetmap.org/',
+              },
+              tileMatrixSet: 'PM',
+              mimetype: 'image/png',
+           },
+        });
+
+        // Add an WMS imagery layer (see WMS_Provider* for valid options)
+        /*view.addLayer({
             url: 'https://download.data.grandlyon.com/wms/grandlyon',
             networkOptions: { crossOrigin: 'anonymous' },
             type: 'color',
@@ -56,21 +80,7 @@ class Itowns extends React.Component {
                 options: {},
             },
         });
-
-        // Add an WMS elevation layer (see WMS_Provider* for valid options)
-        view.addLayer({
-            url: 'https://download.data.grandlyon.com/wms/grandlyon',
-            type: 'elevation',
-            protocol: 'wms',
-            networkOptions: { crossOrigin: 'anonymous' },
-            id: 'wms_elevation',
-            name: 'MNT2012_Altitude_10m_CC46',
-            projection: 'EPSG:3946',
-            heightMapWidth: 256,
-            options: {
-                mimetype: 'image/jpeg',
-            },
-        });
+        */
         // Since the elevation layer use color textures, specify min/max z
         view.tileLayer.materialOptions = {
             useColorTextureElevation: true,

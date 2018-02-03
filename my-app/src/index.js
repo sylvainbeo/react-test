@@ -6,7 +6,7 @@ import Itowns from './Components/Itowns';
 import Filters from './Components/Filters';
 import MapApiSelector from './Components/MapApiSelector';
 
-import * as h from './helper';
+//import * as h from './helper';
 
 import '../node_modules/openlayers/dist/ol.css';
 import './index.css';

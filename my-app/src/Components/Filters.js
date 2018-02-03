@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as h from '../helper';
+//import * as h from '../helper';
 
 class Filters extends React.Component {
     constructor(props) {
