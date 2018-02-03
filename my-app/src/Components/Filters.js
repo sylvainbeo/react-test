@@ -1,6 +1,6 @@
 import React from 'react';
 
-import config from '../settings.js';
+import * as h from '../helper';
 
 class Filters extends React.Component {
     constructor(props) {
@@ -12,15 +12,15 @@ class Filters extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        config.DEBUG ? console.log('Filter will receive new props', nextProps): null;
+        console.log('Filter will receive new props', nextProps);
         this.setState({
-                centerText: nextProps.parentApi.data.center.join(',') ,
-                zoom: nextProps.parentApi.data.zoom
+            centerText: nextProps.parentApi.data.center.join(',') ,
+            zoom: nextProps.parentApi.data.zoom
         });
     }
 
     render() {
-        config.DEBUG ? console.log('Filters is rendering'): null;
+        console.log('Filters is rendering');
 
         const handleChange = (e) => this.props.parentApi.callbacks.updateCenter(this.state.centerText.split(',') );
         const handleTextChange = (e) => this.setState({ centerText: e.target.value });

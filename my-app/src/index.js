@@ -2,9 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Ol from './Components/Ol';
+import Itowns from './Components/Itowns';
 import Filters from './Components/Filters';
+import MapApiSelector from './Components/MapApiSelector';
 
-import config from './settings.js';
+import * as h from './helper';
+
 import '../node_modules/openlayers/dist/ol.css';
 import './index.css';
 
@@ -25,30 +28,46 @@ class Main extends React.Component {
         xIsNext: true,
         centerMap: [5, 45],
         zoomMap: 5,
+        mapApi: "ol",
     };
   }
 
   render() {
-    config.DEBUG ? console.log('Main is rendering'): null;
+    console.log('Main is rendering');
     const updateCenter = center => {
-      config.DEBUG ? console.log('updateCenter'): null;;
+      console.log('updateCenter');
       this.setState({ centerMap: center });
     };
     const updateZoom = zoom => {
-      config.DEBUG ? console.log('updateZoom'): null;;
+      console.log('updateZoom');
       this.setState({ zoomMap: zoom });
+    };
+    const updateApi = api => {
+      console.log('updateApi : ', api);
+      this.setState({ mapApi: api });
     };
 
     const api = {
-        data: {center: this.state.centerMap, zoom: this.state.zoomMap},
-        callbacks: {updateZoom, updateCenter}
+        data: {center: this.state.centerMap, zoom: this.state.zoomMap, api: this.state.mapApi},
+        callbacks: {updateZoom, updateCenter, updateApi}
     };
+
+    let chosenMapApi = null;
+    if (this.state.mapApi === "ol") {
+      chosenMapApi = <Ol parentApi={api} />;
+    } else {
+      chosenMapApi = <Itowns parentApi={api} />;
+    }
 
     return (
         <div className="main">
-            <div className="navbar">Navbar</div>
+            <div className="navbar">
+                <MapApiSelector parentApi={api} />
+            </div>
             <div className="map" >
-                <Ol parentApi={api} />
+                {/*<Ol parentApi={api} />*/}
+                {chosenMapApi}
+
                 <Filters parentApi={api} />
             </div>
         </div>

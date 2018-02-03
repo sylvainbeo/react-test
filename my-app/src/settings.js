@@ -1,6 +1,6 @@
 const config = {
 
-  DEBUG: false
+  DEBUG: true
 
 };
 
