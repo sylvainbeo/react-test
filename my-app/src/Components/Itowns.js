@@ -1,6 +1,6 @@
 import React from 'react';
 import * as itowns from 'itowns';
-//import * as THREE from 'three';
+import * as THREE from 'three';
 import proj4 from 'proj4';
 
 //import * as h from '../helper';
@@ -14,92 +14,107 @@ class Itowns extends React.Component {
         const center = this.props.parentApi.data.center;
         const zoom = this.props.parentApi.data.zoom;
 
-        var renderer; var exports = {};
-        //var proj4 = itowns.proj4;
-
-        var extent;
-        var viewerDiv;
-        var view;
-
-        // Define projection that we will use (taken from https://epsg.io/3946, Proj4js section)
-        proj4.defs('EPSG:3946',
-            '+proj=lcc +lat_1=45.25 +lat_2=46.75 +lat_0=46 +lon_0=3 +x_0=1700000 +y_0=5200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
-        proj4.defs('EPSG:3857',
-            '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
-
+        // # Orthographic viewer
+        var renderer;
         // Define geographic extent: CRS, min/max X, min/max Y
-        /*extent = new itowns.Extent(
-            'EPSG:3946',
-            1837816.94334, 1847692.32501,
-            5170036.4587, 5178412.82698);
-            */
-            extent = new itowns.Extent(
-                'EPSG:3857',
-                -20026376.39, -20048966.10,
-                20026376.39, 20048966.10);
+         var extent = new itowns.Extent(
+            'EPSG:3857',
+            -20026376.39, 20026376.39,
+            -20048966.10, 20048966.10);
 
         // `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
-        viewerDiv = document.getElementById('map');
+        var viewerDiv = document.getElementById('map');
 
-        // Instanciate PlanarView*
-        view = new itowns.PlanarView(viewerDiv, extent, { renderer: renderer });
+        var r = viewerDiv.clientWidth / viewerDiv.clientHeight;
+
+        var camera = new THREE.OrthographicCamera(
+            extent.west(), extent.east(),
+            extent.east() / r, extent.west() / r,
+            0, 1000);
+
+        // Instanciate PlanarView
+        var view = new itowns.PlanarView(
+                viewerDiv, extent, { renderer: renderer, maxSubdivisionLevel: 10, camera: camera });
+
+        var onMouseWheel = function onMouseWheel(event) {
+            var change = 1 - (Math.sign(event.wheelDelta || -event.detail) * 0.1);
+
+            var halfNewWidth = (view.camera.camera3D.right - view.camera.camera3D.left) * change * 0.5;
+            var halfNewHeight = (view.camera.camera3D.top - view.camera.camera3D.bottom) * change * 0.5;
+            var cx = (view.camera.camera3D.right + view.camera.camera3D.left) * 0.5;
+            var cy = (view.camera.camera3D.top + view.camera.camera3D.bottom) * 0.5;
+
+            view.camera.camera3D.left = cx - halfNewWidth;
+            view.camera.camera3D.right = cx + halfNewWidth;
+            view.camera.camera3D.top = cy + halfNewHeight;
+            view.camera.camera3D.bottom = cy - halfNewHeight;
+
+            view.notifyChange(true);
+        };
+
+        var dragStartPosition;
+        var dragCameraStart;
+
+        // By default itowns' tiles geometry have a "skirt" (ie they have a height),
+        // but in case of orthographic we don't need this feature, so disable it
         view.tileLayer.disableSkirt = true;
 
-        // Example to add an OPENSM Layer
+        // Add an TMS imagery layer
         view.addLayer({
-          type: 'color',
-          protocol:   'wmtsc',
-          id:         'OPENSM',
-          fx: 2.5,
-          customUrl:  'http://b.tile.openstreetmap.fr/osmfr/%TILEMATRIX/%COL/%ROW.png',
-          options: {
-              attribution : {
-                  name: 'OpenStreetMap',
-                  url: 'http://www.openstreetmap.org/',
-              },
-              tileMatrixSet: 'PM',
-              mimetype: 'image/png',
-           },
-        });
-
-        // Add an WMS imagery layer (see WMS_Provider* for valid options)
-        /*view.addLayer({
-            url: 'https://download.data.grandlyon.com/wms/grandlyon',
-            networkOptions: { crossOrigin: 'anonymous' },
             type: 'color',
-            protocol: 'wms',
-            version: '1.3.0',
-            id: 'wms_imagery',
-            name: 'Ortho2009_vue_ensemble_16cm_CC46',
-            projection: 'EPSG:3946',
+            protocol: 'tms',
+            id: 'OPENSM',
+            // eslint-disable-next-line no-template-curly-in-string
+            url: 'https://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+            networkOptions: { crossOrigin: 'anonymous' },
+            extent: [extent.west(), extent.east(), extent.south(), extent.north()],
+            projection: 'EPSG:3857',
             options: {
-                mimetype: 'image/jpeg',
+                attribution: {
+                    name: 'OpenStreetMap',
+                    url: 'http://www.openstreetmap.org/',
+                },
             },
             updateStrategy: {
                 type: itowns.STRATEGY_DICHOTOMY,
-                options: {},
             },
         });
-        */
-        // Since the elevation layer use color textures, specify min/max z
-        view.tileLayer.materialOptions = {
-            useColorTextureElevation: true,
-            colorTextureElevationMinZ: 37,
-            colorTextureElevationMaxZ: 240,
-        };
 
-        view.camera.setPosition(new itowns.Coordinates('EPSG:3946', extent.west(), extent.south(), 2000));
-        // Then look at extent's center
-        view.camera.camera3D.lookAt(extent.center().xyz());
+        viewerDiv.addEventListener('DOMMouseScroll', onMouseWheel);
+        viewerDiv.addEventListener('mousewheel', onMouseWheel);
 
-        // instanciate controls
-        // eslint-disable-next-line no-new
-        new itowns.PlanarControls(view, {});
+        viewerDiv.addEventListener('mousedown', function mouseDown(event) {
+            dragStartPosition = new THREE.Vector2(event.clientX, event.clientY);
+            dragCameraStart = {
+                left: view.camera.camera3D.left,
+                right: view.camera.camera3D.right,
+                top: view.camera.camera3D.top,
+                bottom: view.camera.camera3D.bottom,
+            };
+        });
+        viewerDiv.addEventListener('mousemove', function mouseMove(event) {
+            var width;
+            var deltaX;
+            var deltaY;
+            if (dragStartPosition) {
+                width = view.camera.camera3D.right - view.camera.camera3D.left;
+                deltaX = width * (event.clientX - dragStartPosition.x) / -viewerDiv.clientWidth;
+                deltaY = width * (event.clientY - dragStartPosition.y) / viewerDiv.clientHeight;
+
+                view.camera.camera3D.left = dragCameraStart.left + deltaX;
+                view.camera.camera3D.right = dragCameraStart.right + deltaX;
+                view.camera.camera3D.top = dragCameraStart.top + deltaY;
+                view.camera.camera3D.bottom = dragCameraStart.bottom + deltaY;
+                view.notifyChange(true);
+            }
+        });
+        viewerDiv.addEventListener('mouseup', function mouseUp() {
+            dragStartPosition = undefined;
+        });
 
         // Request redraw
         view.notifyChange(true);
 
-        exports.view = view;
     }
 
     componentDidUpdate(prevProps, prevState) {

@@ -10,12 +10,16 @@ class Ol extends React.Component {
         console.log('Ol mounted', this.props.parentApi.data.center, this.props.parentApi.data.zoom);
         const center = this.props.parentApi.data.center;
         const zoom = this.props.parentApi.data.zoom;
+        const OSMSource = this.props.source;
 
+        console.log('------------');
+        console.log(OSMSource);
+        this.osmLayer = new ol.layer.Tile({
+                    source: new ol.source.OSM({url: OSMSource})
+                });
         this.map = new ol.Map({
             layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                })
+                this.osmLayer
             ],
             target: 'map',
             controls: ol.control.defaults({
@@ -61,6 +65,8 @@ class Ol extends React.Component {
         console.log(">>>> Updating map center");
         this.map.getView().setCenter(coords);
 
+        this.osmLayer.setSource(new ol.source.OSM({url: this.props.source}));
+        
         if(prevProps.parentApi.data.zoom !== zoom) {
             console.log(">>>> Updating map zoom");
             this.map.getView().setZoom(zoom);

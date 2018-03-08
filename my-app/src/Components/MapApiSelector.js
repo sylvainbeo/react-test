@@ -28,6 +28,10 @@ class MapApiSelector extends React.Component {
                                value="ol"
                                checked={this.state.api === "ol"}
                                onChange={onMapApiChanged} />OpenLayers
+                <input type="radio" name="ol-dark"
+                               value="ol-dark"
+                               checked={this.state.api === "ol-dark"}
+                               onChange={onMapApiChanged} />OpenLayers dark
                 <input type="radio" name="itowns"
                                value="itowns"
                                checked={this.state.api === "itowns"}

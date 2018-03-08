@@ -53,10 +53,15 @@ class Main extends React.Component {
     };
 
     let chosenMapApi = null;
+    
     if (this.state.mapApi === "ol") {
-      chosenMapApi = <Ol parentApi={api} />;
+        const OSMSource = "http://osm.oslandia.io/styles/klokantech-basic/{z}/{x}/{y}.png"
+        chosenMapApi = <Ol parentApi={api} source={OSMSource}/>;
+    } else if (this.state.mapApi === "ol-dark") {
+        const OSMSource = "http://osm.oslandia.io/styles/dark-matter/{z}/{x}/{y}.png"
+        chosenMapApi = <Ol parentApi={api} source={OSMSource} />;
     } else {
-      chosenMapApi = <Itowns parentApi={api} />;
+        chosenMapApi = <Itowns parentApi={api} />;
     }
 
     return (
