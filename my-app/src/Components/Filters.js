@@ -8,6 +8,7 @@ class Filters extends React.Component {
         this.state = {
             centerText: props.parentApi.data.center.join(','),
             zoom: props.parentApi.data.zoom,
+            zone: props.parentApi.data.zone
         };
     }
 
@@ -15,7 +16,8 @@ class Filters extends React.Component {
         console.log('Filter will receive new props', nextProps);
         this.setState({
             centerText: nextProps.parentApi.data.center.join(',') ,
-            zoom: nextProps.parentApi.data.zoom
+            zoom: nextProps.parentApi.data.zoom,
+            zone: nextProps.parentApi.data.zone
         });
     }
 
@@ -28,6 +30,11 @@ class Filters extends React.Component {
         const handleButtonZoom = (e) => this.props.parentApi.callbacks.updateZoom(this.state.zoom );
         const handleZoomChange = (e) => this.setState({ zoom: e.target.value });
 
+        const handleZoneChange = (e) => {
+            this.setState({zone: e.target.value});
+            this.props.parentApi.callbacks.updateZone(e.target.value);
+        }
+
         return (
             <div className="filters">
                 <input type="button" id="filter1" value="Center map" onClick={handleChange} />
@@ -36,6 +43,16 @@ class Filters extends React.Component {
                 <br/>
                 <input type="button" id="filter3" value="Zoom to" onClick={handleButtonZoom} />
                 <input type="text" value={this.state.zoom} onChange={handleZoomChange}/>
+                <br/>
+
+                <label>
+                    Zone:
+                    <select value={this.state.zone} onChange={handleZoneChange}>
+                        <option value="one">One</option>
+                        <option value="two">Two</option>
+                    </select>
+                </label>
+
             </div>
         );
     }

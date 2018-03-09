@@ -29,31 +29,45 @@ class Main extends React.Component {
         centerMap: [5, 45],
         zoomMap: 5,
         mapApi: "ol",
+        zone: "one"
     };
   }
 
   render() {
-    console.log('Main is rendering');
+//     console.log('Main is rendering');
     const updateCenter = center => {
-      console.log('updateCenter');
+//       console.log('updateCenter');
       this.setState({ centerMap: center });
     };
     const updateZoom = zoom => {
-      console.log('updateZoom');
+//       console.log('updateZoom');
       this.setState({ zoomMap: zoom });
     };
     const updateApi = api => {
-      console.log('updateApi : ', api);
+//       console.log('updateApi : ', api);
       this.setState({ mapApi: api });
+    };
+    const updateZone = zone => {
+      console.log('updateZone : ', zone);
+      this.setState({ zone: zone });
     };
 
     const api = {
-        data: {center: this.state.centerMap, zoom: this.state.zoomMap, api: this.state.mapApi},
-        callbacks: {updateZoom, updateCenter, updateApi}
+        data: {
+                center: this.state.centerMap,
+                zoom: this.state.zoomMap,
+                api: this.state.mapApi,
+                zone: this.state.zone
+        },
+        callbacks: {updateZoom,
+                    updateCenter,
+                    updateApi,
+                    updateZone
+        }
     };
 
     let chosenMapApi = null;
-    
+
     if (this.state.mapApi === "ol") {
         const OSMSource = "http://osm.oslandia.io/styles/klokantech-basic/{z}/{x}/{y}.png"
         chosenMapApi = <Ol parentApi={api} source={OSMSource}/>;

@@ -55,13 +55,14 @@ class Ol extends React.Component {
         console.log('Ol has been updated, update the map itself');
         let tabCoords = this.props.parentApi.data.center;
         let zoom = this.props.parentApi.data.zoom;
+        let zone = this.props.parentApi.data.zone;
 
         // Convert strings to float
         let coords = ol.proj.transform([parseFloat(tabCoords[0]), parseFloat(tabCoords[1])], 'EPSG:4326', 'EPSG:3857');
 
         // TODO
-        console.log(prevProps.parentApi.data.center);
-        console.log(tabCoords);
+//         console.log(prevProps.parentApi.data.center);
+//         console.log(tabCoords);
         console.log(">>>> Updating map center");
         this.map.getView().setCenter(coords);
 
@@ -71,6 +72,13 @@ class Ol extends React.Component {
             console.log(">>>> Updating map zoom");
             this.map.getView().setZoom(zoom);
         }
+        
+        if(prevProps.parentApi.data.zone !== zone) {
+            console.log(">>>> Updating map zone");
+            this.loadStations();
+        }
+        
+        
     }
 
     // That way we can share info beetween parent and child
@@ -89,22 +97,37 @@ class Ol extends React.Component {
         });
         */
         // In localhost :
-        const data = require('../data/items.json');
+        let data;
+        if(this.props.parentApi.data.zone === "two") {
+            data = require('../data/items2.json');
+        }
+        if(this.props.parentApi.data.zone === "one"){
+            data = require('../data/items.json');
+        }
+
         this.setState({
             items: data
         });
-        console.log(data);
+//         console.log(data);
         var vectorSource = new ol.source.Vector({
             features: (new ol.format.GeoJSON()).readFeatures(data)
         });
-        var vectorLayer = new ol.layer.Vector({
+        if(this.dataLayer) {
+            // Clean layer
+            if(this.dataLayer.getSource().clear) {
+                this.dataLayer.getSource().clear(true); // True is for fast deletion
+            }
+            this.map.removeLayer(this.dataLayer);
+        }
+
+        this.dataLayer = new ol.layer.Vector({
             source: vectorSource,
             style: styleFunction
         });
         var geojsonFormat = new ol.format.GeoJSON();
         vectorSource.clear(true);
         vectorSource.addFeatures(geojsonFormat.readFeatures(data));
-        this.map.addLayer(vectorLayer);
+        this.map.addLayer(this.dataLayer);
     }
 }
 
