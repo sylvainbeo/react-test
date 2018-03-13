@@ -5,6 +5,7 @@ import Ol from './Components/Ol';
 import Itowns from './Components/Itowns';
 import Filters from './Components/Filters';
 import MapApiSelector from './Components/MapApiSelector';
+import Charts from './Components/Charts';
 
 //import * as h from './helper';
 
@@ -88,6 +89,7 @@ class Main extends React.Component {
                 {chosenMapApi}
 
                 <Filters parentApi={api} />
+                <Charts parentApi={api} />
             </div>
         </div>
     );
